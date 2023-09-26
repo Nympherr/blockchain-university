@@ -9,17 +9,22 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		programStart();
+		int userChoice = programStart();
+		String userMessage;
 		
-		StringBuilder binaryString = createEmptyBinaryString();
-		System.out.println("binary: " + binaryString);
+		if(userChoice == 1) {
+			userMessage = getUserInput();
+		}
+		else {
+			userMessage = getFileContent();
+		}
 		
-		binaryString = changeCharacterAtIndex(binaryString,'A');
+		String modifiedUserInput = iterateUserInput(userMessage);
+		String hash = convertBinaryToHex(modifiedUserInput);
 		
-		String binaryHex = convertBinaryToHex(binaryString.toString());
+		System.out.println("Binary: " + modifiedUserInput);
+		System.out.println("Hex: " + hash);
 		
-		System.out.println("binary: " + binaryString);
-		System.out.println("hex: " + binaryHex);
 	}
 	
 	public static StringBuilder createEmptyBinaryString() {
@@ -28,7 +33,7 @@ public class Main {
 		StringBuilder emptyBinaryString = new StringBuilder(bitLength);
 		
 		for(int i = 0; i < bitLength; i++) {
-			emptyBinaryString.append("1");
+			emptyBinaryString.append("0");
 		}
 		
 		return emptyBinaryString;
@@ -133,7 +138,6 @@ public class Main {
         	int userChoice = scanner.nextInt();
         	
         	if(userChoice == 1 || userChoice == 2 ) {
-        		scanner.close();
         		return userChoice;
         	}
         	else {
@@ -141,6 +145,19 @@ public class Main {
         	}
     		
     	}while(true);
+    }
+    
+    public static String iterateUserInput(String message) {
+    	
+		StringBuilder binaryString = createEmptyBinaryString();
+		
+		for(int i = 0; i < message.length(); i++) {
+			char currentLetter = message.charAt(i);
+			
+			binaryString = changeCharacterAtIndex(binaryString, currentLetter);
+		}
+		
+		return binaryString.toString();
     }
 
 }
