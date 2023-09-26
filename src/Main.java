@@ -1,4 +1,9 @@
 import java.math.BigInteger;
+import java.util.Scanner;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Main {
 
@@ -8,14 +13,6 @@ public class Main {
 		System.out.println("binary: " + binaryString);
 		
 		binaryString = changeCharacterAtIndex(binaryString,'A');
-		
-		StringBuilder binaryString2 = createEmptyBinaryString();
-		binaryString2 = changeCharacterAtIndex(binaryString2,'B');
-		System.out.println("binary2: " + binaryString2);
-		
-		StringBuilder binaryString3 = createEmptyBinaryString();
-		binaryString3 = changeCharacterAtIndex(binaryString3,'C');
-		System.out.println("binary3: " + binaryString3);
 		
 		String binaryHex = convertBinaryToHex(binaryString.toString());
 		
@@ -75,6 +72,49 @@ public class Main {
 
 	    return binaryString;
 	}
+	
+	public static String getUserInput() {
+		
+		Scanner scanner = new Scanner(System.in);
+		
+		System.out.print("Write a string you wish to hash: ");
+		String userInput = scanner.nextLine();
+		
+		scanner.close();
+		
+		return userInput;
+		
+	}
 
+	public static String getFileContent() {
+		
+		Scanner scanner = new Scanner(System.in);
+
+        boolean validFile = false;
+        String fileName = "";
+        String fileContents = "";
+
+        while (!validFile) {
+            System.out.print("Enter the file name: ");
+
+            fileName = scanner.nextLine();
+
+            try {
+                fileContents = readFileToString(fileName);
+                System.out.println("File Contents:\n" + fileContents);
+                validFile = true;
+            } catch (IOException e) {
+                System.err.println("Invalid file name or file not found. Please try again.");
+            }
+        }
+
+        scanner.close();
+        return fileContents;
+    }
+	
+    public static String readFileToString(String filePath) throws IOException {
+        byte[] encodedBytes = Files.readAllBytes(Paths.get(filePath));
+        return new String(encodedBytes, StandardCharsets.UTF_8);
+    }
 
 }
