@@ -5,7 +5,17 @@ public class Main {
 	public static void main(String[] args) {
 		
 		StringBuilder binaryString = createEmptyBinaryString();
+		System.out.println("binary: " + binaryString);
+		
 		binaryString = changeCharacterAtIndex(binaryString,'A');
+		
+		StringBuilder binaryString2 = createEmptyBinaryString();
+		binaryString2 = changeCharacterAtIndex(binaryString2,'B');
+		System.out.println("binary2: " + binaryString2);
+		
+		StringBuilder binaryString3 = createEmptyBinaryString();
+		binaryString3 = changeCharacterAtIndex(binaryString3,'C');
+		System.out.println("binary3: " + binaryString3);
 		
 		String binaryHex = convertBinaryToHex(binaryString.toString());
 		
@@ -43,6 +53,8 @@ public class Main {
 			binaryString.setCharAt(index,'1');
 		}
 		
+		binaryString = shiftBinaryStringRight(binaryString, index + 1);
+		
 		return binaryString;
 
 	}
@@ -52,5 +64,17 @@ public class Main {
 		return (int) symbol;
 		
 	}
+	
+	public static StringBuilder shiftBinaryStringRight(StringBuilder binaryString, int shiftAmount) {
+
+	    String removedBits = binaryString.substring(256 - shiftAmount);
+
+	    binaryString.delete(256 - shiftAmount, 256);
+
+	    binaryString.insert(0, removedBits);
+
+	    return binaryString;
+	}
+
 
 }
