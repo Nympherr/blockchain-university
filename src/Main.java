@@ -9,6 +9,8 @@ public class Main {
 
 	public static void main(String[] args) {
 		
+		programStart();
+		
 		StringBuilder binaryString = createEmptyBinaryString();
 		System.out.println("binary: " + binaryString);
 		
@@ -115,6 +117,30 @@ public class Main {
     public static String readFileToString(String filePath) throws IOException {
         byte[] encodedBytes = Files.readAllBytes(Paths.get(filePath));
         return new String(encodedBytes, StandardCharsets.UTF_8);
+    }
+    
+    public static int programStart() {
+    	
+    	Scanner scanner = new Scanner(System.in);
+    	
+    	System.out.println("How would you like to generate a hash:");
+    	System.out.println("1. Write a message");
+    	System.out.println("2. Read from a file");
+    	
+    	do {
+    		
+        	System.out.print("Your answer: ");
+        	int userChoice = scanner.nextInt();
+        	
+        	if(userChoice == 1 || userChoice == 2 ) {
+        		scanner.close();
+        		return userChoice;
+        	}
+        	else {
+        		System.out.println("\nYou can only select 1 or 2!");
+        	}
+    		
+    	}while(true);
     }
 
 }
