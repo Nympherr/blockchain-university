@@ -1,58 +1,60 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.math.BigInteger;
+
 import java.text.Normalizer;
 import java.util.regex.Pattern;
 
 /*
  * This class compares hashes in a file
  * File must have string pairs(separated by comma in 1 line)
- * At the end it displays how many strings contain same hashes
- * and how many don't
+ * At the end it displays how many percentage of bits are different
+ * (shows MIN, MAX, AVG values)
  */
-public class CompareHashes {
+public class CompareHashes2 {
 
 	// Program start
 	public static void main(String[] args) {
 		
-        int repeated = 0;
-        int notRepeated = 0;
-        
         String fileName = "oneLetter.txt";
-        
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-        	
-            String line;
-            
-            while ((line = br.readLine()) != null) {
 
+        int minPercentageDifference = Integer.MAX_VALUE;
+        int maxPercentageDifference = 0;
+        int totalPercentageDifference = 0;
+        int numRows = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+            	
                 String[] words = line.split(",");
                 String word1 = words[0].trim();
                 String word2 = words[1].trim();
 
-                String hashedWord1 = convertBinaryToHex(hashingFunction(addSalt(deAccent(word1))));
-                // System.out.println("hash #1: " + hashedWord1);
-                String hashedWord2 = convertBinaryToHex(hashingFunction(addSalt(deAccent(word2))));
-                // System.out.println("hash #2: " + hashedWord2);
+                String hashedWord1 = hashingFunction(addSalt(deAccent(word1)));
+                String hashedWord2 = hashingFunction(addSalt(deAccent(word2)));
 
-                if (hashedWord1.equals(hashedWord2)) {
-                    repeated++;
-                }
-                else {
-                    notRepeated++;
-                }
+                int percentageDifference = calculatePercentageDifference(hashedWord1, hashedWord2);
+
+                minPercentageDifference = Math.min(minPercentageDifference, percentageDifference);
+                maxPercentageDifference = Math.max(maxPercentageDifference, percentageDifference);
+
+                totalPercentageDifference += percentageDifference;
+
+                numRows++;
             }
-
-            System.out.println("Repeated hashes: " + repeated);
-            System.out.println("Not repeated hashes: " + notRepeated + "\n");
-            
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        double averagePercentageDifference = (double) totalPercentageDifference / numRows;
+
+        System.out.println("Minimum Percentage Difference: " + minPercentageDifference + "%");
+        System.out.println("Maximum Percentage Difference: " + maxPercentageDifference + "%");
+        System.out.println("Average Percentage Difference: " + averagePercentageDifference + "%");
     }
 	
-	// Creates 256bit empty binary string(all values are 0's) 
 	private static StringBuilder createEmptyBinaryString() {
 		
 		int bitLength = 256;
@@ -64,13 +66,6 @@ public class CompareHashes {
 		
 		return emptyBinaryString;
 		
-	}
-	
-	// Takes binary value and converts it to hexadecimal
-	private static String convertBinaryToHex(String binaryString) {
-		
-		BigInteger binaryDecimal = new BigInteger(binaryString, 2);
-		return binaryDecimal.toString(16);
 	}
 	
 	/*
@@ -210,4 +205,14 @@ public class CompareHashes {
         
     }
 
+    private static int calculatePercentageDifference(String binary1, String binary2) {
+        int totalBits = binary1.length();
+        int differentBits = 0;
+        for (int i = 0; i < totalBits; i++) {
+            if (binary1.charAt(i) != binary2.charAt(i)) {
+                differentBits++;
+            }
+        }
+        return (int) ((differentBits / (double) totalBits) * 100);
+    }
 }
