@@ -216,6 +216,10 @@ public class HashFunc {
     	
     	StringBuilder salt = new StringBuilder();
     	
+    	if(userMessage.isEmpty()) {
+    		userMessage = "EMPTY";
+    	}
+    	
     	for(int i = 0; i < userMessage.length() && i < 10; i++) {
     		
     		char symbol = userMessage.charAt(i);
