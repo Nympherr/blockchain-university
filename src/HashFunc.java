@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.Normalizer;
+import java.util.regex.Pattern;
 
 public class HashFunc {
 
@@ -11,6 +13,7 @@ public class HashFunc {
 	public static void main(String[] args) {
 		
 	    String inputMessage = programStart(args);
+	    inputMessage = deAccent(inputMessage);
 	    inputMessage = addSalt(inputMessage) + inputMessage;
 	    
 	    String hashedMessage = hashingFunction(inputMessage);
@@ -55,15 +58,17 @@ public class HashFunc {
 		
 		int index = getAsciiValue(symbol) - 1;
 		
-		for(int i = index; i > 0; i = i - 3) {
+		if (index >= 0 && index < binaryString.length()) {
+			for(int i = index; i > 0; i = i - 3) {
 
-			if(binaryString.charAt(i) == '1') {
-				binaryString.setCharAt(i,'0');
-			}
-			else {
-				binaryString.setCharAt(i,'1');
-			}
+				if(binaryString.charAt(i) == '1') {
+					binaryString.setCharAt(i,'0');
+				}
+				else {
+					binaryString.setCharAt(i,'1');
+				}
 			
+			}
 		}
 		
 		return shiftBinaryString(binaryString, index + 1);
@@ -81,6 +86,10 @@ public class HashFunc {
 	//Shifts all binary string to right, according to symbol's ASCII value
 	private static StringBuilder shiftBinaryString(StringBuilder binaryString, int shiftAmount) {
 
+		if (shiftAmount <= 0 || shiftAmount >= binaryString.length()) {
+	        return binaryString;
+	    }
+		
 	    String removedBits = binaryString.substring(256 - shiftAmount);
 
 	    binaryString.delete(256 - shiftAmount, 256);
@@ -194,12 +203,18 @@ public class HashFunc {
     	
 		StringBuilder binaryString = createEmptyBinaryString();
 		
+		long startTime = System.currentTimeMillis();
+		
 		for(int i = 0; i < message.length(); i++) {
 			
 			char currentLetter = message.charAt(i);
 			
 			binaryString = shuffleStringValues(binaryString, currentLetter);
 		}
+		
+		long endTime = System.currentTimeMillis();
+		long executionTime = endTime - startTime;
+		System.out.println("\nExecution time: " + executionTime + " milliseconds");
 		
 		return binaryString.toString();
 		
@@ -252,6 +267,18 @@ public class HashFunc {
     	
     	return salt.toString();
     	
+    }
+    
+    /*
+     * Converts non ASCII value's to ASCII.
+     * For example it will return ė as e or ą as a.
+     */
+    private static String deAccent(String str) {
+    	
+        String nfdNormalizedString = Normalizer.normalize(str, Normalizer.Form.NFD); 
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(nfdNormalizedString).replaceAll("");
+        
     }
 
 }
