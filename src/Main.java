@@ -19,6 +19,7 @@ public class Main {
 			userMessage = getFileContent();
 		}
 		
+		userMessage = addSalt(userMessage) + userMessage;
 		String modifiedUserInput = iterateUserInput(userMessage);
 		String hash = convertBinaryToHex(modifiedUserInput);
 		
@@ -50,11 +51,16 @@ public class Main {
 		
 		int index = getAsciiValue(symbol) - 1;
 		
-		if(binaryString.charAt(index) == '1') {
-			binaryString.setCharAt(index,'0');
-		}
-		else {
-			binaryString.setCharAt(index,'1');
+		for(int i = index; i > 0; i = i - 3) {
+
+		
+			if(binaryString.charAt(i) == '1') {
+				binaryString.setCharAt(i,'0');
+			}
+			else {
+				binaryString.setCharAt(i,'1');
+			}
+			
 		}
 		
 		binaryString = shiftBinaryStringRight(binaryString, index + 1);
@@ -158,6 +164,42 @@ public class Main {
 		}
 		
 		return binaryString.toString();
+    }
+    
+    public static String addSalt(String userMessage) {
+    	
+    	StringBuilder salt = new StringBuilder();
+    	
+    	for(int i = 0; i < userMessage.length() & i < 10; i++) {
+    		
+    		char symbol = userMessage.charAt(i);
+    		int value = (int) symbol;
+    		String temporaryValue = Integer.toString(value);
+    		
+    		salt.append("X" + temporaryValue);
+    		
+    			for(int j = 0; j < temporaryValue.length(); j++) {
+    				
+    				char nestedSymbol = temporaryValue.charAt(j);
+    				int nestedValue = (int) nestedSymbol;
+    				String temporaryNestedValue = Integer.toString(nestedValue);
+    				
+    	    		salt.append(temporaryNestedValue);
+    	    		
+    	    		for(int x = 0; x < temporaryNestedValue.length(); x++) {
+    	    			
+        				char nestedSymbol2 = temporaryNestedValue.charAt(x);
+        				int nestedValue2 = (int) nestedSymbol2;
+        				String temporaryNestedValue2 = Integer.toString(nestedValue2);
+        				
+        	    		salt.append(temporaryNestedValue2);
+    	    		}
+    			}
+    			
+    			
+    	}
+    	System.out.println(salt.toString());
+    	return salt.toString();
     }
 
 }
