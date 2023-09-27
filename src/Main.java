@@ -9,24 +9,16 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		int userChoice = programStart();
-		String userMessage;
-		
-		if(userChoice == 1) {
-			userMessage = getUserInput();
-		}
-		else {
-			userMessage = getFileContent();
-		}
-		
-		userMessage = addSalt(userMessage) + userMessage;
-		String modifiedUserInput = iterateUserInput(userMessage);
-		String hash = convertBinaryToHex(modifiedUserInput);
-		
-		System.out.println("Binary: " + modifiedUserInput);
-		System.out.println("Hex: " + hash);
-		
+	    String userMessage = programStart(args);
+
+	    userMessage = addSalt(userMessage) + userMessage;
+	    String modifiedUserInput = iterateUserInput(userMessage);
+	    String hash = convertBinaryToHex(modifiedUserInput);
+
+	    System.out.println("Binary: " + modifiedUserInput);
+	    System.out.println("Hex: " + hash);
 	}
+
 	
 	public static StringBuilder createEmptyBinaryString() {
 		
@@ -130,28 +122,65 @@ public class Main {
         return new String(encodedBytes, StandardCharsets.UTF_8);
     }
     
-    public static int programStart() {
+    public static String programStart(String[] args) {
     	
-    	Scanner scanner = new Scanner(System.in);
-    	
-    	System.out.println("How would you like to generate a hash:");
-    	System.out.println("1. Write a message");
-    	System.out.println("2. Read from a file");
-    	
-    	do {
+        String userMessage = "";
+        
+    	if (args.length != 2) {
+	        System.out.println("How would you like to hash the message:");
+	        System.out.println("1. Write a message");
+	        System.out.println("2. Read from a file");
+
+	        Scanner scanner = new Scanner(System.in);
+	        System.out.print("Your Answer: ");
+	        int userChoice = scanner.nextInt();
+	        
+	        if (userChoice == 1) {
+	            scanner.nextLine();
+	            System.out.print("Enter message: ");
+	            userMessage = scanner.nextLine();
+	        } 
+	        else if (userChoice == 2) {
+	            scanner.nextLine();
+	            System.out.print("Enter file name: ");
+	            String fileName = scanner.nextLine();
+	            try {
+	                userMessage = readFileToString(fileName);
+	            }
+	            catch (IOException e) {
+	                System.err.println("Invalid file name or file not found. Please try again.");
+	                System.exit(1);
+	            }
+	        }
+	        else {
+	            System.out.println("Invalid answer. Write 1 for message and 2 for file");
+	            System.exit(1);
+	        }
+    	}
+    	else {
     		
-        	System.out.print("Your answer: ");
-        	int userChoice = scanner.nextInt();
-        	
-        	if(userChoice == 1 || userChoice == 2 ) {
-        		return userChoice;
-        	}
-        	else {
-        		System.out.println("\nYou can only select 1 or 2!");
-        	}
-    		
-    	}while(true);
-    }
+            int userChoice = Integer.parseInt(args[0]);
+
+            if (userChoice == 1) {
+                userMessage = args[1];
+            }
+            else if (userChoice == 2) {
+            	
+                try {
+                    userMessage = readFileToString(args[1]);
+                }
+                catch (IOException e) {
+                    System.err.println("Invalid file name or file not found. Please try again.");
+                    System.exit(1);
+                }
+            }
+            else {
+                System.out.println("Invalid mode. Use <mode>: 1 for message, 2 for file");
+                System.exit(1);
+            }
+    	}
+    	return userMessage;
+   }
     
     public static String iterateUserInput(String message) {
     	
@@ -170,7 +199,7 @@ public class Main {
     	
     	StringBuilder salt = new StringBuilder();
     	
-    	for(int i = 0; i < userMessage.length() & i < 10; i++) {
+    	for(int i = 0; i < userMessage.length() && i < 10; i++) {
     		
     		char symbol = userMessage.charAt(i);
     		int value = (int) symbol;
