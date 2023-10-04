@@ -15,7 +15,7 @@ public class HashFunc {
 	    String inputMessage = programStart(args);
 	    inputMessage = checkSymbols(inputMessage);
 	    inputMessage = shuffleInput(inputMessage);
-	    inputMessage = addSalt(inputMessage) + inputMessage;
+	    inputMessage = addSalt(inputMessage);
 	    
 	    String hashedMessage = hashingFunction(inputMessage);
 	    String hash = convertBinaryToHex(hashedMessage);
@@ -35,7 +35,6 @@ public class HashFunc {
 		}
 		
 		return emptyBinaryString;
-		
 	}
 	
 	// Takes binary value and converts it to hexadecimal
@@ -80,7 +79,6 @@ public class HashFunc {
 	private static int getAsciiValue(char symbol) {
 		
 		return (int) symbol;
-		
 	}
 	
 	
@@ -108,7 +106,6 @@ public class HashFunc {
     	
         byte[] encodedBytes = Files.readAllBytes(Paths.get(filePath));
         return new String(encodedBytes, StandardCharsets.UTF_8);
-        
     }
     
     /*
@@ -221,7 +218,6 @@ public class HashFunc {
 		System.out.println("\nExecution time: " + executionTime + " milliseconds");
 		
 		return binaryString.toString();
-		
     }
     
     /*
@@ -270,7 +266,6 @@ public class HashFunc {
     	}
     	
     	return salt.toString();
-    	
     }
     
     /*
@@ -282,7 +277,6 @@ public class HashFunc {
         String nfdNormalizedString = Normalizer.normalize(str, Normalizer.Form.NFD); 
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return pattern.matcher(nfdNormalizedString).replaceAll("");
-        
     }
     
     /*
@@ -299,7 +293,7 @@ public class HashFunc {
     		asciiResult = asciiResult + input.charAt(i);
     	}
     	
-    	asciiResult = (asciiResult % 256) + (asciiResult / 256);
+    	asciiResult = asciiResult % 256;
     	
 		if (asciiResult >= input.length()) {
 			asciiResult = asciiResult % input.length();
@@ -310,6 +304,5 @@ public class HashFunc {
 		modifiedInput.insert(0, removedText);
 		
 		return modifiedInput.toString();    
-		
 	}
 }
