@@ -13,8 +13,8 @@ public class FileGenerator2 {
 
     public static void main(String[] args) {
     	
-        String fileName = "stringPairs.txt";
-        int numRows = 25000;
+        String fileName = "zero.txt";
+        int numRows = 100;
         int stringLength = 1000;
 
         generateStringPairsWithSingleDifference(fileName, numRows, stringLength);
@@ -52,14 +52,18 @@ public class FileGenerator2 {
     private static void generateStringPairsWithSingleDifference(String fileName, int numRows, int stringLength) {
     	
         try (FileWriter writer = new FileWriter(fileName, true)) {
-        	
             for (int i = 0; i < numRows; i++) {
-            	
-                String originalString = generateRandomString(stringLength);
-                String modifiedString = generateStringWithSingleDifference(originalString);
+                String originalString;
+                String modifiedString;
+
+                do {
+                    originalString = generateRandomString(stringLength);
+                    modifiedString = generateStringWithSingleDifference(originalString);
+                }
+                while (originalString.equals(modifiedString));
+
                 String stringPair = originalString + "," + modifiedString + "\n";
                 writer.write(stringPair);
-                
             }
         }
         catch (IOException e) {
