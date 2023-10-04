@@ -3,18 +3,18 @@ import java.io.IOException;
 import java.util.Random;
 
 /*
- * Generates random String pairs in file.
- * String pairs are same, only one letter is different
- * between them
+ * Same as "StringGenerator" class but only difference
+ * is that the string pairs are different just by 1 symbol
  */
-public class FileGenerator2 {
+public class StringGenerator2 {
 
     private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     public static void main(String[] args) {
     	
-        String fileName = "zero.txt";
-        int numRows = 100;
+		// Change all these variables as you need
+        String fileName = "didelisATSSimb.txt";
+        int numRows = 25000;
         int stringLength = 1000;
 
         generateStringPairsWithSingleDifference(fileName, numRows, stringLength);

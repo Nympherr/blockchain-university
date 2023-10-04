@@ -4,15 +4,17 @@ import java.util.Random;
 
 /*
  * Generates random String pairs in file.
- * String pairs are same length but their body is different
+ * String pairs are same length but their content is different
+ * (This class helps to test the hash function)
  */
-public class FileGenerator {
+public class StringGenerator {
 
 	private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 	public static void main(String[] args) {
 		
-        String fileName = "stringPairs.txt";
+		// Change all these variables as you need
+        String fileName = "didelisATS.txt";
         int numRows = 25000;
         int stringLength = 1000;
 

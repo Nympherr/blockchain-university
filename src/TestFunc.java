@@ -7,11 +7,10 @@ import java.util.regex.Pattern;
 
 /*
  * This class compares hashes in a file
- * File must have string pairs(separated by comma in 1 line)
+ * File must have string pairs(separated by comma on same line)
  * At the end it displays how many strings contain same hashes
- * and how many don't
  */
-public class CompareHashes {
+public class TestFunc {
 
 	// Program start
 	public static void main(String[] args) {
@@ -19,7 +18,7 @@ public class CompareHashes {
         int repeated = 0;
         int notRepeated = 0;
         
-        String fileName = "oneLetter.txt";
+        String fileName = "didelisATS.txt"; // Change this value
         
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
         	
@@ -31,10 +30,8 @@ public class CompareHashes {
                 String word1 = words[0].trim();
                 String word2 = words[1].trim();
 
-                String hashedWord1 = convertBinaryToHex(hashingFunction(addSalt(deAccent(word1))));
-                // System.out.println("hash #1: " + hashedWord1);
-                String hashedWord2 = convertBinaryToHex(hashingFunction(addSalt(deAccent(word2))));
-                // System.out.println("hash #2: " + hashedWord2);
+                String hashedWord1 = convertBinaryToHex(hashingFunction(addSalt(shuffleInput(checkSymbols(word1)))));
+                String hashedWord2 = convertBinaryToHex(hashingFunction(addSalt(shuffleInput(checkSymbols(word2)))));
 
                 if (hashedWord1.equals(hashedWord2)) {
                     repeated++;
@@ -47,7 +44,8 @@ public class CompareHashes {
             System.out.println("Repeated hashes: " + repeated);
             System.out.println("Not repeated hashes: " + notRepeated + "\n");
             
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -63,7 +61,6 @@ public class CompareHashes {
 		}
 		
 		return emptyBinaryString;
-		
 	}
 	
 	// Takes binary value and converts it to hexadecimal
@@ -85,47 +82,46 @@ public class CompareHashes {
 	 */
 	private static StringBuilder shuffleStringValues(StringBuilder binaryString,char symbol) {
 		
-		int index = getAsciiValue(symbol) - 1;
+			int index = getAsciiValue(symbol) - 1;
 		
-		if (index >= 0 && index < binaryString.length()) {
-			for(int i = index; i > 0; i = i - 3) {
+			if (index >= 0 && index < binaryString.length()) {
+				
+				for(int i = index; i > 0; i = i - 3) {
 
-				if(binaryString.charAt(i) == '1') {
-					binaryString.setCharAt(i,'0');
-				}
-				else {
-					binaryString.setCharAt(i,'1');
-				}
+					if(binaryString.charAt(i) == '1') {
+						binaryString.setCharAt(i,'0');
+					}
+					else {
+						binaryString.setCharAt(i,'1');
+					}
 			
+				}
 			}
-		}
 		
 		return shiftBinaryString(binaryString, index + 1);
-		
 	}
 	
 	// Get's symbol's ASCII value
 	private static int getAsciiValue(char symbol) {
 		
 		return (int) symbol;
-		
 	}
 	
 	
 	//Shifts all binary string to right, according to symbol's ASCII value
 	private static StringBuilder shiftBinaryString(StringBuilder binaryString, int shiftAmount) {
-
-		if (shiftAmount <= 0 || shiftAmount >= binaryString.length()) {
-	        return binaryString;
-	    }
+			
+			if (shiftAmount <= 0 || shiftAmount >= binaryString.length()) {
+				return binaryString;
+			}
 		
-	    String removedBits = binaryString.substring(256 - shiftAmount);
+			String removedBits = binaryString.substring(256 - shiftAmount);
 
-	    binaryString.delete(256 - shiftAmount, 256);
+			binaryString.delete(256 - shiftAmount, 256);
 
-	    binaryString.insert(0, removedBits);
+			binaryString.insert(0, removedBits);
 
-	    return binaryString;
+		return binaryString;
 	}
     
     /*
@@ -145,8 +141,7 @@ public class CompareHashes {
 			binaryString = shuffleStringValues(binaryString, currentLetter);
 		}
 		
-		return binaryString.toString();
-		
+		return binaryString.toString();	
     }
     
     /*
@@ -195,19 +190,44 @@ public class CompareHashes {
     	}
     	
     	return salt.toString();
-    	
     }
     
     /*
      * Converts non ASCII value's to ASCII.
      * For example it will return ė as e or ą as a.
      */
-    private static String deAccent(String str) {
+    private static String checkSymbols(String str) {
     	
         String nfdNormalizedString = Normalizer.normalize(str, Normalizer.Form.NFD); 
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return pattern.matcher(nfdNormalizedString).replaceAll("");
-        
     }
+    
+    /*
+     * Shuffles the original input String before adding salt
+     * Sums up ASCII values of all characters, then divides
+     * that result and shuffles all string to the right
+     */
+    private static String shuffleInput(String input) {
+    	
+    	int asciiResult = 0;
+    	StringBuilder modifiedInput = new StringBuilder(input);
+    	
+    	for(int i = 0; i < input.length(); i++) {
+    		asciiResult = asciiResult + input.charAt(i);
+    	}
+    	
+    	asciiResult = asciiResult % 256;
+    	
+		if (asciiResult >= input.length()) {
+			asciiResult = asciiResult % input.length();
+		}
+		
+		String removedText = modifiedInput.substring(modifiedInput.length() - asciiResult);
+		modifiedInput.delete(removedText.length() - asciiResult, removedText.length());
+		modifiedInput.insert(0, removedText);
+		
+		return modifiedInput.toString();    
+	}
 
 }

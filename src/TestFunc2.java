@@ -1,22 +1,22 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-
+import java.math.BigInteger;
 import java.text.Normalizer;
 import java.util.regex.Pattern;
 
 /*
  * This class compares hashes in a file
- * File must have string pairs(separated by comma in 1 line)
- * At the end it displays how many percentage of bits are different
+ * File must have string pairs(separated by comma on same line)
+ * At the end it displays how many percentage of bits/hex are different
  * (shows MIN, MAX, AVG values)
  */
-public class CompareHashes2 {
+public class TestFunc2 {
 
 	// Program start
 	public static void main(String[] args) {
 		
-        String fileName = "oneLetter.txt";
+        String fileName = "didelisATSSimb.txt"; // Change this
 
         int minPercentageDifference = Integer.MAX_VALUE;
         int maxPercentageDifference = 0;
@@ -24,6 +24,7 @@ public class CompareHashes2 {
         int numRows = 0;
 
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+        	
             String line;
 
             while ((line = br.readLine()) != null) {
@@ -31,20 +32,25 @@ public class CompareHashes2 {
                 String[] words = line.split(",");
                 String word1 = words[0].trim();
                 String word2 = words[1].trim();
+                
+                // For checking bit difference
+                String hashedWord1 = hashingFunction(addSalt(shuffleInput(checkSymbols(word1))));
+                String hashedWord2 = hashingFunction(addSalt(shuffleInput(checkSymbols(word2))));
 
-                String hashedWord1 = hashingFunction(addSalt(deAccent(word1)));
-                String hashedWord2 = hashingFunction(addSalt(deAccent(word2)));
+                // For checking hex difference
+//              String hashedWord1 = convertBinaryToHex(hashingFunction(addSalt(shuffleInput(checkSymbols(word1)))));
+//              String hashedWord2 = convertBinaryToHex(hashingFunction(addSalt(shuffleInput(checkSymbols(word2)))));
 
                 int percentageDifference = calculatePercentageDifference(hashedWord1, hashedWord2);
 
                 minPercentageDifference = Math.min(minPercentageDifference, percentageDifference);
                 maxPercentageDifference = Math.max(maxPercentageDifference, percentageDifference);
-
                 totalPercentageDifference += percentageDifference;
 
                 numRows++;
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -65,7 +71,24 @@ public class CompareHashes2 {
 		}
 		
 		return emptyBinaryString;
-		
+	}
+	
+	private static String convertBinaryToHex(String binaryString) {
+	    // Pad the binary string with leading zeros to ensure it's a multiple of 4 bits (64 bits in this case).
+	    while (binaryString.length() % 4 != 0) {
+	        binaryString = "0" + binaryString;
+	    }
+
+	    // Convert the binary string to hexadecimal.
+	    BigInteger binaryDecimal = new BigInteger(binaryString, 2);
+	    String hexString = binaryDecimal.toString(16);
+
+	    // Ensure the hexadecimal string is 64 characters long by adding leading zeros if needed.
+	    while (hexString.length() < 64) {
+	        hexString = "0" + hexString;
+	    }
+
+	    return hexString;
 	}
 	
 	/*
@@ -96,14 +119,12 @@ public class CompareHashes2 {
 		}
 		
 		return shiftBinaryString(binaryString, index + 1);
-		
 	}
 	
 	// Get's symbol's ASCII value
 	private static int getAsciiValue(char symbol) {
 		
 		return (int) symbol;
-		
 	}
 	
 	
@@ -141,7 +162,6 @@ public class CompareHashes2 {
 		}
 		
 		return binaryString.toString();
-		
     }
     
     /*
@@ -190,29 +210,55 @@ public class CompareHashes2 {
     	}
     	
     	return salt.toString();
-    	
     }
     
     /*
      * Converts non ASCII value's to ASCII.
      * For example it will return ė as e or ą as a.
      */
-    private static String deAccent(String str) {
+    private static String checkSymbols(String str) {
     	
         String nfdNormalizedString = Normalizer.normalize(str, Normalizer.Form.NFD); 
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return pattern.matcher(nfdNormalizedString).replaceAll("");
-        
     }
 
-    private static int calculatePercentageDifference(String binary1, String binary2) {
-        int totalBits = binary1.length();
-        int differentBits = 0;
-        for (int i = 0; i < totalBits; i++) {
-            if (binary1.charAt(i) != binary2.charAt(i)) {
-                differentBits++;
+    private static int calculatePercentageDifference(String string1, String string2) {
+    	
+        int totalLength = string1.length();
+        int differentCharacters = 0;
+        for (int i = 0; i < totalLength; i++) {
+            if (string1.charAt(i) != string2.charAt(i)) {
+            	differentCharacters++;
             }
         }
-        return (int) ((differentBits / (double) totalBits) * 100);
+        return (int) ((differentCharacters / (double) totalLength) * 100);
     }
+    
+    /*
+     * Shuffles the original input String before adding salt
+     * Sums up ASCII values of all characters, then divides
+     * that result and shuffles all string to the right
+     */
+    private static String shuffleInput(String input) {
+    	
+    	int asciiResult = 0;
+    	StringBuilder modifiedInput = new StringBuilder(input);
+    	
+    	for(int i = 0; i < input.length(); i++) {
+    		asciiResult = asciiResult + input.charAt(i);
+    	}
+    	
+    	asciiResult = asciiResult % 256;
+    	
+		if (asciiResult >= input.length()) {
+			asciiResult = asciiResult % input.length();
+		}
+		
+		String removedText = modifiedInput.substring(modifiedInput.length() - asciiResult);
+		modifiedInput.delete(removedText.length() - asciiResult, removedText.length());
+		modifiedInput.insert(0, removedText);
+		
+		return modifiedInput.toString();    
+	}
 }

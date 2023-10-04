@@ -85,8 +85,6 @@ public class HashFunc {
 	//Shifts all binary string to right, according to symbol's ASCII value
 	private static StringBuilder shiftBinaryString(StringBuilder binaryString, int shiftAmount) {
 
-
-			
 		if (shiftAmount <= 0 || shiftAmount >= binaryString.length()) {
 	        return binaryString;
 	    }
@@ -96,7 +94,6 @@ public class HashFunc {
 	    binaryString.delete(256 - shiftAmount, 256);
 
 	    binaryString.insert(0, removedBits);
-	    
 
 	    return binaryString;
 	}
@@ -286,6 +283,11 @@ public class HashFunc {
      */
     private static String shuffleInput(String input) {
     	
+    	if(input.isEmpty()) {
+    		return "";
+    	}
+    	
+
     	int asciiResult = 0;
     	StringBuilder modifiedInput = new StringBuilder(input);
     	
@@ -298,6 +300,10 @@ public class HashFunc {
 		if (asciiResult >= input.length()) {
 			asciiResult = asciiResult % input.length();
 		}
+		
+		if (asciiResult <= 0 || asciiResult >= input.length()) {
+	        return input;
+	    }
 		
 		String removedText = modifiedInput.substring(modifiedInput.length() - asciiResult);
 		modifiedInput.delete(removedText.length() - asciiResult, removedText.length());
