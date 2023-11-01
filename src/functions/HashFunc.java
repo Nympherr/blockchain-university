@@ -1,54 +1,22 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+package functions;
 import java.math.BigInteger;
 import java.text.Normalizer;
 import java.util.regex.Pattern;
 
-/*
- * This class compares hashes in a file
- * File must have string pairs(separated by comma on same line)
- * At the end it displays how many strings contain same hashes
- */
-public class TestFunc {
+public class HashFunc {
 
-	// Program start
-	public static void main(String[] args) {
-		
-        int repeated = 0;
-        int notRepeated = 0;
-        
-        String fileName = "didelisATS.txt"; // Change this value
-        
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-        	
-            String line;
-            
-            while ((line = br.readLine()) != null) {
+	 public static String generateHash(String inputMessage) {
 
-                String[] words = line.split(",");
-                String word1 = words[0].trim();
-                String word2 = words[1].trim();
+	        inputMessage = checkSymbols(inputMessage);
+	        inputMessage = shuffleInput(inputMessage);
+	        inputMessage = addSalt(inputMessage);
 
-                String hashedWord1 = convertBinaryToHex(hashingFunction(addSalt(shuffleInput(checkSymbols(word1)))));
-                String hashedWord2 = convertBinaryToHex(hashingFunction(addSalt(shuffleInput(checkSymbols(word2)))));
+	        String hashedMessage = hashingFunction(inputMessage);
 
-                if (hashedWord1.equals(hashedWord2)) {
-                    repeated++;
-                }
-                else {
-                    notRepeated++;
-                }
-            }
+	        String hash = convertBinaryToHex(hashedMessage);
 
-            System.out.println("Repeated hashes: " + repeated);
-            System.out.println("Not repeated hashes: " + notRepeated + "\n");
-            
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+	        return hash;
+	    }
 	
 	// Creates 256bit empty binary string(all values are 0's) 
 	private static StringBuilder createEmptyBinaryString() {
@@ -82,23 +50,23 @@ public class TestFunc {
 	 */
 	private static StringBuilder shuffleStringValues(StringBuilder binaryString,char symbol) {
 		
-			int index = getAsciiValue(symbol) - 1;
+		int index = getAsciiValue(symbol) - 1;
 		
-			if (index >= 0 && index < binaryString.length()) {
-				
-				for(int i = index; i > 0; i = i - 3) {
+		if (index >= 0 && index < binaryString.length()) {
+			for(int i = index; i > 0; i = i - 3) {
 
-					if(binaryString.charAt(i) == '1') {
-						binaryString.setCharAt(i,'0');
-					}
-					else {
-						binaryString.setCharAt(i,'1');
-					}
-			
+				if(binaryString.charAt(i) == '1') {
+					binaryString.setCharAt(i,'0');
 				}
+				else {
+					binaryString.setCharAt(i,'1');
+				}
+			
 			}
+		}
 		
 		return shiftBinaryString(binaryString, index + 1);
+		
 	}
 	
 	// Get's symbol's ASCII value
@@ -110,18 +78,18 @@ public class TestFunc {
 	
 	//Shifts all binary string to right, according to symbol's ASCII value
 	private static StringBuilder shiftBinaryString(StringBuilder binaryString, int shiftAmount) {
-			
-			if (shiftAmount <= 0 || shiftAmount >= binaryString.length()) {
-				return binaryString;
-			}
+
+		if (shiftAmount <= 0 || shiftAmount >= binaryString.length()) {
+	        return binaryString;
+	    }
 		
-			String removedBits = binaryString.substring(256 - shiftAmount);
+	    String removedBits = binaryString.substring(256 - shiftAmount);
 
-			binaryString.delete(256 - shiftAmount, 256);
+	    binaryString.delete(256 - shiftAmount, 256);
 
-			binaryString.insert(0, removedBits);
+	    binaryString.insert(0, removedBits);
 
-		return binaryString;
+	    return binaryString;
 	}
     
     /*
@@ -141,7 +109,7 @@ public class TestFunc {
 			binaryString = shuffleStringValues(binaryString, currentLetter);
 		}
 		
-		return binaryString.toString();	
+		return binaryString.toString();
     }
     
     /*
@@ -153,6 +121,10 @@ public class TestFunc {
      */
     private static String addSalt(String userMessage) {
     	
+    	// "X" -> 50 =50
+    	// 5 -> 60
+    		
+    	// 0 -> 55
     	StringBuilder salt = new StringBuilder();
     	
     	if(userMessage.isEmpty()) {
@@ -210,6 +182,11 @@ public class TestFunc {
      */
     private static String shuffleInput(String input) {
     	
+    	if(input.isEmpty()) {
+    		return "";
+    	}
+    	
+
     	int asciiResult = 0;
     	StringBuilder modifiedInput = new StringBuilder(input);
     	
@@ -223,11 +200,14 @@ public class TestFunc {
 			asciiResult = asciiResult % input.length();
 		}
 		
+		if (asciiResult <= 0 || asciiResult >= input.length()) {
+	        return input;
+	    }
+		
 		String removedText = modifiedInput.substring(modifiedInput.length() - asciiResult);
 		modifiedInput.delete(removedText.length() - asciiResult, removedText.length());
 		modifiedInput.insert(0, removedText);
 		
 		return modifiedInput.toString();    
 	}
-
 }

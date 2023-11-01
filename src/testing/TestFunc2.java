@@ -1,3 +1,4 @@
+package testing;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -34,12 +35,12 @@ public class TestFunc2 {
                 String word2 = words[1].trim();
                 
                 // For checking bit difference
-                String hashedWord1 = hashingFunction(addSalt(shuffleInput(checkSymbols(word1))));
-                String hashedWord2 = hashingFunction(addSalt(shuffleInput(checkSymbols(word2))));
+//                String hashedWord1 = hashingFunction(addSalt(shuffleInput(checkSymbols(word1))));
+//                String hashedWord2 = hashingFunction(addSalt(shuffleInput(checkSymbols(word2))));
 
                 // For checking hex difference
-//              String hashedWord1 = convertBinaryToHex(hashingFunction(addSalt(shuffleInput(checkSymbols(word1)))));
-//              String hashedWord2 = convertBinaryToHex(hashingFunction(addSalt(shuffleInput(checkSymbols(word2)))));
+              String hashedWord1 = convertBinaryToHex(hashingFunction(addSalt(shuffleInput(checkSymbols(word1)))));
+              String hashedWord2 = convertBinaryToHex(hashingFunction(addSalt(shuffleInput(checkSymbols(word2)))));
 
                 int percentageDifference = calculatePercentageDifference(hashedWord1, hashedWord2);
 
@@ -74,16 +75,14 @@ public class TestFunc2 {
 	}
 	
 	private static String convertBinaryToHex(String binaryString) {
-	    // Pad the binary string with leading zeros to ensure it's a multiple of 4 bits (64 bits in this case).
+
 	    while (binaryString.length() % 4 != 0) {
 	        binaryString = "0" + binaryString;
 	    }
 
-	    // Convert the binary string to hexadecimal.
 	    BigInteger binaryDecimal = new BigInteger(binaryString, 2);
 	    String hexString = binaryDecimal.toString(16);
 
-	    // Ensure the hexadecimal string is 64 characters long by adding leading zeros if needed.
 	    while (hexString.length() < 64) {
 	        hexString = "0" + hexString;
 	    }

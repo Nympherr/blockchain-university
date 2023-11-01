@@ -1,28 +1,55 @@
-import java.math.BigInteger;
-import java.util.Scanner;
+package testing;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.math.BigInteger;
 import java.text.Normalizer;
 import java.util.regex.Pattern;
 
-public class HashFunc {
+/*
+ * This class compares hashes in a file
+ * File must have string pairs(separated by comma on same line)
+ * At the end it displays how many strings contain same hashes
+ */
+public class TestFunc {
 
 	// Program start
 	public static void main(String[] args) {
 		
-	    String inputMessage = programStart(args);
-	    inputMessage = checkSymbols(inputMessage);
-	    inputMessage = shuffleInput(inputMessage);
-	    inputMessage = addSalt(inputMessage);
-	    
-	    String hashedMessage = hashingFunction(inputMessage);
-	    String hash = convertBinaryToHex(hashedMessage);
+        int repeated = 0;
+        int notRepeated = 0;
+        
+        String fileName = "didelisATSSimb.txt"; // Change this value
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+        	
+            String line;
+            
+            while ((line = br.readLine()) != null) {
 
-	    System.out.println("\nHash: " + hash);
+                String[] words = line.split(",");
+                String word1 = words[0].trim();
+                String word2 = words[1].trim();
 
-	}
+                String hashedWord1 = convertBinaryToHex(hashingFunction(addSalt(shuffleInput(checkSymbols(word1)))));
+                String hashedWord2 = convertBinaryToHex(hashingFunction(addSalt(shuffleInput(checkSymbols(word2)))));
+
+                if (hashedWord1.equals(hashedWord2)) {
+                    repeated++;
+                }
+                else {
+                    notRepeated++;
+                }
+            }
+
+            System.out.println("Repeated hashes: " + repeated);
+            System.out.println("Not repeated hashes: " + notRepeated + "\n");
+            
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 	
 	// Creates 256bit empty binary string(all values are 0's) 
 	private static StringBuilder createEmptyBinaryString() {
@@ -56,23 +83,23 @@ public class HashFunc {
 	 */
 	private static StringBuilder shuffleStringValues(StringBuilder binaryString,char symbol) {
 		
-		int index = getAsciiValue(symbol) - 1;
+			int index = getAsciiValue(symbol) - 1;
 		
-		if (index >= 0 && index < binaryString.length()) {
-			for(int i = index; i > 0; i = i - 3) {
+			if (index >= 0 && index < binaryString.length()) {
+				
+				for(int i = index; i > 0; i = i - 3) {
 
-				if(binaryString.charAt(i) == '1') {
-					binaryString.setCharAt(i,'0');
-				}
-				else {
-					binaryString.setCharAt(i,'1');
-				}
+					if(binaryString.charAt(i) == '1') {
+						binaryString.setCharAt(i,'0');
+					}
+					else {
+						binaryString.setCharAt(i,'1');
+					}
 			
+				}
 			}
-		}
 		
 		return shiftBinaryString(binaryString, index + 1);
-		
 	}
 	
 	// Get's symbol's ASCII value
@@ -84,112 +111,19 @@ public class HashFunc {
 	
 	//Shifts all binary string to right, according to symbol's ASCII value
 	private static StringBuilder shiftBinaryString(StringBuilder binaryString, int shiftAmount) {
-
-		if (shiftAmount <= 0 || shiftAmount >= binaryString.length()) {
-	        return binaryString;
-	    }
+			
+			if (shiftAmount <= 0 || shiftAmount >= binaryString.length()) {
+				return binaryString;
+			}
 		
-	    String removedBits = binaryString.substring(256 - shiftAmount);
+			String removedBits = binaryString.substring(256 - shiftAmount);
 
-	    binaryString.delete(256 - shiftAmount, 256);
+			binaryString.delete(256 - shiftAmount, 256);
 
-	    binaryString.insert(0, removedBits);
+			binaryString.insert(0, removedBits);
 
-	    return binaryString;
+		return binaryString;
 	}
-	
-	// Reads file's contents and puts it into string
-    private static String readFile(String filePath) throws IOException {
-    	
-        byte[] encodedBytes = Files.readAllBytes(Paths.get(filePath));
-        return new String(encodedBytes, StandardCharsets.UTF_8);
-    }
-    
-    /*
-     * Function which is responsible for the start of the program
-     * It allows to give arguments in command line and execute the
-     * code immediately: F.E. write "java program_name 1 "hello world"
-     * 
-     * Also acts accordingly if we start from IDE and do not give any
-     * arguments
-     */
-    private static String programStart(String[] args) {
-    	
-        String userMessage = "";
-        
-        // If in command line we did not provide 2 arguments
-    	if (args.length != 2) {
-    		
-	        System.out.println("How would you like to hash the message:");
-	        System.out.println("1. Write a message");
-	        System.out.println("2. Read from a file");
-
-	        Scanner scanner = new Scanner(System.in);
-	        System.out.print("Your Answer: ");
-	        int userChoice = scanner.nextInt();
-	        
-	        // 1 - user writes it's own message which he wants to hash
-	        if (userChoice == 1) {
-	        	
-	            scanner.nextLine();
-	            System.out.print("Enter message: ");
-	            userMessage = scanner.nextLine();
-	            
-	        } 
-	        
-	        // 2 - reading file and hashing it
-	        else if (userChoice == 2) {
-	        	
-	            scanner.nextLine();
-	            System.out.print("Enter file name: ");
-	            String fileName = scanner.nextLine();
-	            
-	            try {
-	                userMessage = readFile(fileName);
-	            }
-	            catch (IOException e) {
-	                System.err.println("Invalid file name or file not found. Please try again.");
-	                System.exit(1);
-	            }
-	        }
-	        else {
-	        	
-	            System.out.println("Invalid answer. Write 1 for message and 2 for file");
-	            System.exit(1);
-	            
-	        }
-    	}
-    	
-    	// This block is executed when we provide 2 arguments in command line
-    	// F.E. "java program_name 1 "hello"
-    	else {
-    		
-            int userChoice = Integer.parseInt(args[0]);
-
-            if (userChoice == 1) {
-            	
-                userMessage = args[1];
-                
-            }
-            else if (userChoice == 2) {
-            	
-                try {
-                    userMessage = readFile(args[1]);
-                }
-                catch (IOException e) {
-                    System.err.println("Invalid file name or file not found. Please try again.");
-                    System.exit(1);
-                }
-            }
-            else {
-            	
-                System.out.println("Invalid answer. Write 1 for message and 2 for file");
-                System.exit(1);
-                
-            }
-    	}
-    	return userMessage;
-    }
     
     /*
      * 1) Creates empty 256-bit size binary string
@@ -201,8 +135,6 @@ public class HashFunc {
     	
 		StringBuilder binaryString = createEmptyBinaryString();
 		
-		long startTime = System.currentTimeMillis();
-		
 		for(int i = 0; i < message.length(); i++) {
 			
 			char currentLetter = message.charAt(i);
@@ -210,11 +142,7 @@ public class HashFunc {
 			binaryString = shuffleStringValues(binaryString, currentLetter);
 		}
 		
-		long endTime = System.currentTimeMillis();
-		long executionTime = endTime - startTime;
-		System.out.println("\nExecution time: " + executionTime + " milliseconds");
-		
-		return binaryString.toString();
+		return binaryString.toString();	
     }
     
     /*
@@ -283,11 +211,6 @@ public class HashFunc {
      */
     private static String shuffleInput(String input) {
     	
-    	if(input.isEmpty()) {
-    		return "";
-    	}
-    	
-
     	int asciiResult = 0;
     	StringBuilder modifiedInput = new StringBuilder(input);
     	
@@ -301,14 +224,11 @@ public class HashFunc {
 			asciiResult = asciiResult % input.length();
 		}
 		
-		if (asciiResult <= 0 || asciiResult >= input.length()) {
-	        return input;
-	    }
-		
 		String removedText = modifiedInput.substring(modifiedInput.length() - asciiResult);
 		modifiedInput.delete(removedText.length() - asciiResult, removedText.length());
 		modifiedInput.insert(0, removedText);
 		
 		return modifiedInput.toString();    
 	}
+
 }
