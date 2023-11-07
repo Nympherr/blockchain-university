@@ -3,7 +3,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
-
 import functions.GenerateNames;
 import functions.GeneratePrivateKey;
 import functions.HashFunc;
@@ -14,7 +13,7 @@ public class User {
 	private final int rangeMin = 100;
 	private final int rangeMax = 1000000;
 	
-	public static int numberOfUsers = 1;
+	public static int numberOfUsers = 0;
 	
 	private int ID;
 	private String name;
@@ -66,5 +65,8 @@ public class User {
 	}
 	public String getName() {
 		return this.name;
+	}
+	public String getPublicKey() {
+		return this.publicKey;
 	}
 }
