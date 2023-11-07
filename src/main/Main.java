@@ -1,51 +1,60 @@
 package main;
-
-import models.User;
-import models.Block;
-import models.Transaction;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
-import functions.GetUsers;
+import java.util.Scanner;
 
 public class Main {
     
     public static void main(String[] args) {
-        List<User> userList = GetUsers.getUsers();
-        List<Transaction> transactionPool = new ArrayList<>();
 
-        Random rand = new Random();
-        for (int i = 0; i < 10000; i++) {
-
-            int index1, index2;
-            do {
-                index1 = rand.nextInt(userList.size());
-                index2 = rand.nextInt(userList.size());
-            } while (index1 == index2);
-
-            User user1 = userList.get(index1);
-            User user2 = userList.get(index2);
-
-            int amount = rand.nextInt(100000) + 1;    
-            Transaction transaction = new Transaction(user1, user2, amount);
-            transactionPool.add(transaction);
-        }
-
-        String previousBlockHash = "some_hash_value";
-
-        while (transactionPool.size() >= 100) {
-            // Get first 100 transactions
-            List<Transaction> blockTransactions = transactionPool.subList(0, 100);
-
-            // Create new Block
-            Block newBlock = new Block(new ArrayList<>(blockTransactions), previousBlockHash, 1, 0);
-            newBlock.mineBlock(0); 
-            newBlock.saveBlockToFile();
-            transactionPool.subList(0, 100).clear(); 
-            previousBlockHash = newBlock.calculateHash();
-        }
+    	Scanner scanner = new Scanner(System.in);
+    	boolean programRunning = true;
+    	
+    	while(programRunning) {
+	    	System.out.println("==================================");
+	    	System.out.println("||                              ||");
+	    	System.out.println("||       PROGRAM START          ||");
+	    	System.out.println("||                              ||");
+	    	System.out.println("==================================");
+	    	System.out.println();
+	    	System.out.println("------------------------");
+	    	System.out.println("1.Sukurti atsitiktinius vartotojus");
+	    	System.out.println("2.Sukurti atsitiktines transakcijas");
+	    	System.out.println("3.Bloko kasimas");
+	    	System.out.println("4.Bloko peržiūra");
+	    	System.out.println("5.Transakcijos peržiūra");
+	    	System.out.println("6.Bendra informacija");
+	    	System.out.println("7.Baigti darbą");
+	    	System.out.println("------------------------");
+	    	System.out.print("Jūsų pasirinkimas:");
+	    	int choice = scanner.nextInt();
+	    	
+	    	switch(choice) {
+	    	
+	    		case 1:
+	    			System.out.println("This is first option");
+	    			break;
+	    		case 2:
+	    			System.out.println("This is second option");
+	    			break;
+	    		case 3:
+	    			System.out.println("This is third option");
+	    			break;
+	    		case 4:
+	    			System.out.println("This is fourth option");
+	    			break;
+	    		case 5:
+	    			System.out.println("This is fifth option");
+	    			break;
+	    		case 6:
+	    			System.out.println("This is sixth option");
+	    			break;
+	    		case 7:
+	    			System.out.println("Program ends");
+	    			programRunning = false;
+	    			break;
+	    		default:
+	    			System.out.println("Blogas pasirinkimas, bandykite per naujo");
+	    			break;
+	    	}
+    	}
     }
 }

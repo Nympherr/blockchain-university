@@ -2,9 +2,9 @@ package functions;
 
 import java.util.Random;
 
-public class GeneratePublicKey {
+public class GeneratePrivateKey {
 
-    public static String generateRandomPublicKey() {
+    public static String generateRandomPrivateKey() {
         String alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder publicKey = new StringBuilder();
         Random rand = new Random();

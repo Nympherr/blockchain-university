@@ -1,16 +1,18 @@
 package models;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 
 import functions.GenerateNames;
-import functions.GeneratePublicKey;
+import functions.GeneratePrivateKey;
 import functions.HashFunc;
 
 public class User {
+	
+	private Random rand = new Random();
+	private final int rangeMin = 100;
+	private final int rangeMax = 1000000;
 	
 	public static int numberOfUsers = 1;
 	
@@ -23,44 +25,19 @@ public class User {
 	public User(){
 		
 		this.ID = numberOfUsers;
+		this.name = GenerateNames.generateRandomName();
+		this.privateKey = GeneratePrivateKey.generateRandomPrivateKey();
+		this.publicKey = HashFunc.generateHash(this.privateKey);
+		this.balance = rand.nextInt(rangeMax - rangeMin + 2) + rangeMin;
+		
+		createUserFile();
 		numberOfUsers++;
 		
-		this.name = GenerateNames.generateRandomName();
-		
-		this.publicKey = GeneratePublicKey.generateRandomPublicKey();
-		this.publicKey = HashFunc.generateHash(this.publicKey);
-		
-		int rangeMin = 100;
-		int rangeMax = 1000000;
-		Random rand = new Random();
-		this.balance = rand.nextInt(rangeMax - rangeMin + 2) + rangeMin;
-		createUserFile();
-	}
-	
-	public User(String fileName) {
-	    try {
-	        BufferedReader reader = new BufferedReader(new FileReader(fileName));
-	        String line;
-	        while ((line = reader.readLine()) != null) {
-	            if (line.startsWith("ID: ")) {
-	                this.ID = Integer.parseInt(line.substring(4));
-	            } else if (line.startsWith("Name: ")) {
-	                this.name = line.substring(6);
-	            } else if (line.startsWith("Public Key: ")) {
-	                this.publicKey = line.substring(12);
-	            } else if (line.startsWith("Balance: ")) {
-	                this.balance = Integer.parseInt(line.substring(9));
-	            }
-	        }
-	        reader.close();
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
 	}
 	
 	public void createUserFile() {
+		
 		try {
-
 		    java.nio.file.Path path = java.nio.file.Paths.get("blockchain/users");
 		    if (!java.nio.file.Files.exists(path)) {
 		        java.nio.file.Files.createDirectories(path);
@@ -70,7 +47,8 @@ public class User {
 		    BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
 		    writer.write(this.toString());
 		    writer.close();
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 		    e.printStackTrace();
 		}
 	}
@@ -88,16 +66,5 @@ public class User {
 	}
 	public String getName() {
 		return this.name;
-	}
-	public void changeFileInfo() {
-		try {
-			String fileName = "blockchain/users/User_" + this.ID + ".txt";
-			BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
-			writer.write(this.toString());
-			writer.close();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 }
