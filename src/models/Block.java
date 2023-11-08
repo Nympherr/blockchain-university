@@ -1,15 +1,13 @@
 package models;
 
-import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
 
-import functions.HashFunc;
 import functions.MerkleRootHash;
+import functions.NewHash;
 import functions.SelectRandomTransactions;
 import main.Main;
 
@@ -43,30 +41,33 @@ public class Block {
     }
 
     public String calculateHash() {
-        return HashFunc.generateHash(this.merkleRootHash + this.previousBlockHash + this.formattedCreationTime + this.version + this.difficultyTarget + Integer.toString(nonce));
+        return NewHash.sha256(this.merkleRootHash + this.previousBlockHash + this.formattedCreationTime + this.version + this.difficultyTarget + Integer.toString(nonce));
     }
 
     public void mineBlock() {
     	
-    	nonce = 0;
-    	
-        blockHash = this.calculateHash();
-        String target = new String(new char[this.difficultyTarget]).replace('\0', '0');
-        do {
-            nonce++; // Update the nonce for each attempt
-            blockHash = calculateHash(); // Calculate the hash with the new nonce
-        } while (!blockHash.substring(0, this.difficultyTarget).equals(target)); // Loop until the hash has enough leading zeros
-        
-        System.out.println("\nBlock Mined with hash: " + blockHash);
-        System.out.println("Block Mined with nonce: " + nonce);
-        Main.transactionPool.removeAll(this.transactions);
-        for(Transaction transaction : this.transactions) {
-        	Main.usedTransactions.put(transaction, this);
-        }
-        saveBlockToFile();
-        blocksInChain++;
-        LocalDateTime minedTime = LocalDateTime.now();
-        this.formattedMinedTime = minedTime.format(formatter); 
+    	if(this.transactions.size() > 0) {
+        	nonce = 0;
+        	
+            blockHash = this.calculateHash();
+            String target = new String(new char[this.difficultyTarget]).replace('\0', '0');
+            do {
+                nonce++;
+                blockHash = calculateHash();
+            } while (!blockHash.substring(0, this.difficultyTarget).equals(target));
+            
+            
+            System.out.println("\nBlock Mined with hash: " + blockHash);
+            System.out.println("Block Mined with nonce: " + nonce);
+            Main.transactionPool.removeAll(this.transactions);
+            for(Transaction transaction : this.transactions) {
+            	Main.usedTransactions.put(transaction, this);
+            }
+            saveBlockToFile();
+            blocksInChain++;
+            LocalDateTime minedTime = LocalDateTime.now();
+            this.formattedMinedTime = minedTime.format(formatter); 
+    	}
     }
     
     public void saveBlockToFile() {

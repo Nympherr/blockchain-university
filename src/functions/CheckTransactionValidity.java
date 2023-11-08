@@ -1,6 +1,7 @@
 package functions;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import models.Transaction;
 
@@ -18,30 +19,24 @@ public class CheckTransactionValidity {
 		
 		int removedTransactions = 0;
 		int validTransactions = 0;
+		Iterator<Transaction> iterator = transactionPool.iterator();
 		
-		for(Transaction transaction : transactionPool) {
-			
-			String transactionSender = transaction.getSender();
-			String transactionReceiver = transaction.getReceiver();
-			int transactionAmount = transaction.getAmount();
-			String transactionTime = transaction.getCreationTime();
-			
-			String transactionHash = HashFunc.generateHash(transactionSender + transactionReceiver + transactionAmount + transactionTime);
-			
-			if(transactionHash.equals(transaction.getTransactionID())) {
-				
-//				System.out.println("Originalus hash: " + transaction.getTransactionID());
-//				System.out.println("Mūsų tikrinamas hash: " + transactionHash);
-//				System.out.println();
-				validTransactions++;
-			}
-			else {
-//				System.out.println("Originalus hash: " + transaction.getTransactionID());
-//				System.out.println("Mūsų tikrinamas hash: " + transactionHash);
-//				System.out.println();
-				transactionPool.remove(transaction);
-				removedTransactions--;
-			}
+		while (iterator.hasNext()) {
+		    Transaction transaction = iterator.next();
+
+		    String transactionSender = transaction.getSender();
+		    String transactionReceiver = transaction.getReceiver();
+		    int transactionAmount = transaction.getAmount();
+		    String transactionTime = transaction.getCreationTime();
+
+		    String transactionHash = NewHash.sha256(transactionSender + transactionReceiver + transactionAmount + transactionTime);
+
+		    if(transactionHash.equals(transaction.getTransactionID())) {
+		        validTransactions++;
+		    } else {
+		        iterator.remove();
+		        removedTransactions++;
+		    }
 		}
 		
 		System.out.println("Blogos/ištrintos transakcijos: " + removedTransactions);

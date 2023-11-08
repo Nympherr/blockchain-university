@@ -6,6 +6,7 @@ import java.util.Random;
 import functions.GenerateNames;
 import functions.GeneratePrivateKey;
 import functions.HashFunc;
+import functions.NewHash;
 
 public class User {
 	
@@ -26,7 +27,7 @@ public class User {
 		this.ID = numberOfUsers;
 		this.name = GenerateNames.generateRandomName();
 		this.privateKey = GeneratePrivateKey.generateRandomPrivateKey();
-		this.publicKey = HashFunc.generateHash(this.privateKey);
+		this.publicKey = NewHash.sha256(this.privateKey);
 		this.balance = rand.nextInt(rangeMax - rangeMin + 2) + rangeMin;
 		
 		createUserFile();

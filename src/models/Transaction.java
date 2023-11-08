@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import functions.HashFunc;
+import functions.NewHash;
 
 public class Transaction {
 
@@ -31,7 +32,7 @@ public class Transaction {
 		this.sender = sender;
 		this.receiver = receiver;
 		this.balance = amount;
-		this.transactionID = HashFunc.generateHash(this.sender.getPublicKey() + this.receiver.getPublicKey() + Integer.toString(amount) + this.formattedCreationTime);
+		this.transactionID = NewHash.sha256(this.sender.getPublicKey() + this.receiver.getPublicKey() + Integer.toString(amount) + this.formattedCreationTime);
 		createTransactionFile();
 		transactionNumber++;
 	}

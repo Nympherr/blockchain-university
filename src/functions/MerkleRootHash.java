@@ -37,7 +37,7 @@ public class MerkleRootHash {
 	    }
 	
     private static String hash(String data) {
-        return HashFunc.generateHash(data);
+        return NewHash.sha256(data);
     }
     
     private static String combineAndHash(String hash1, String hash2) {
