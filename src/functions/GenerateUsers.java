@@ -23,7 +23,6 @@ public class GenerateUsers {
 			Main.users.add(user);
 		}
 		System.out.println("Nauji vartotojai sukurti. Iš viso vartotojų: " + User.numberOfUsers);
-		System.out.println("------------------------");
 		System.out.println("");
 		
 	}

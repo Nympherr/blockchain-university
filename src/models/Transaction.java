@@ -8,14 +8,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import functions.HashFunc;
 
 public class Transaction {
 
+	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	public static int transactionNumber = 0;
 	
-	public LocalDateTime creationTime;
+	public String formattedCreationTime;
 	public String transactionID;
 	private User sender;
 	private User receiver;
@@ -23,11 +25,13 @@ public class Transaction {
 	private boolean transactionUsed = false;
 	
 	public Transaction(User sender, User receiver, int amount) {
-		this.creationTime = LocalDateTime.now();
+		
+        LocalDateTime creationTime = LocalDateTime.now();
+        this.formattedCreationTime = creationTime.format(formatter); 
 		this.sender = sender;
 		this.receiver = receiver;
 		this.balance = amount;
-		this.transactionID = HashFunc.generateHash(this.sender.getPublicKey() + this.receiver.getPublicKey() + Integer.toString(amount));
+		this.transactionID = HashFunc.generateHash(this.sender.getPublicKey() + this.receiver.getPublicKey() + Integer.toString(amount) + this.formattedCreationTime);
 		createTransactionFile();
 		transactionNumber++;
 	}
@@ -35,11 +39,9 @@ public class Transaction {
 	public boolean checkBalance() {
 		
 		if(this.sender.checkBalance() >= getBalance()) {
-			System.out.println("Sender has enough balance to send money");
 			return true;
 		}
 		else {
-			System.out.println("Sender does not have enough balance.");
 			return false;
 		}
 	}
@@ -83,12 +85,24 @@ public class Transaction {
 	public String toString() {
 		return "TransactionID: " + this.transactionID + "\nSender: " + this.sender.getPublicKey()
 				+ "\nReceiver: " + this.receiver.getPublicKey() + "\nBalance: " + Integer.toString(balance)
-				+ "\nIs transaction activated: " + this.transactionUsed + "\nTransaction creation time: " + this.creationTime;
+				+ "\nIs transaction activated: " + this.transactionUsed + "\nTransaction creation time: " + this.formattedCreationTime;
 	}
 	public String getTransactionID() {
 		return this.transactionID;
 	}
 	public int getBalance() {
 		return this.balance;
+	}
+	public String getSender() {
+		return this.sender.getPublicKey();
+	}
+	public String getReceiver() {
+		return this.receiver.getPublicKey();
+	}
+	public int getAmount() {
+		return this.balance;
+	}
+	public String getCreationTime() {
+		return this.formattedCreationTime;
 	}
 }

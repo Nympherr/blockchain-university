@@ -18,7 +18,7 @@ public class GenerateTransactions {
     	System.out.println("============================================");
 		System.out.println("");
 		System.out.println("Vartotojų skaičius: " + User.numberOfUsers);
-		System.out.println("Nepanaudotų transakcijų skaičius: " + Transaction.transactionNumber);
+		System.out.println("Nepanaudotų transakcijų skaičius: " + Main.transactionPool.size());
 		System.out.println("Panaudotų transakcijų skaičius: " + (Transaction.transactionNumber - Main.transactionPool.size()));
 		System.out.print("Kiek norėsite sukurti transakcijų: ");
 		int number = Main.scanner.nextInt();
@@ -41,7 +41,6 @@ public class GenerateTransactions {
 		}
 		
 		System.out.println("Naujos transakcijos sukurtos");
-		System.out.println("------------------------");
 		System.out.println("");
 		
 	}
