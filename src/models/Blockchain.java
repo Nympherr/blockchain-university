@@ -1,13 +1,19 @@
 package models;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.stream.IntStream;
 
 import main.Main;
 
 public class Blockchain {
 	
-	public static int miningDifficulty = 7;
+	public static int miningDifficulty = 6;
 	public static double blockchainVersion = 1.0;
 	public static final int MAX_TRANSACTIONS = 100;
 	
@@ -19,8 +25,8 @@ public class Blockchain {
     }
 
     private Block createGenesisBlock() {
-    	Block block = new Block("0", blockchainVersion, miningDifficulty);
-    	block.mineBlock();
+    	Block block = new Block("0", blockchainVersion, 4);
+    	block.mineGenesisBlock();
         return block;
     }
 
@@ -30,12 +36,6 @@ public class Blockchain {
             Main.blockchain = new Blockchain();
         }
 
-//        String previousBlockHash = this.chain.get(this.chain.size() - 1).getBlockHash();
-//        Block newBlock = new Block(previousBlockHash, blockchainVersion, miningDifficulty);
-//        if (newBlock.getTransactionSize() > 0) {
-//            newBlock.mineBlock();
-//            this.chain.add(newBlock);
-//        }
         addBlockWithCandidates(Main.transactionPool);
     }
     
@@ -50,37 +50,46 @@ public class Blockchain {
     }
     
     public void addBlockWithCandidates(List<Transaction> transactionPool) {
-    	
-        List<Block> candidates = generateBlockCandidates(transactionPool, 5);
+        Random random = new Random();
+        int timeLimitInSeconds = 10;
         boolean isMined = false;
         
-        int timeLimitInSeconds = 1;
-        int maxAttempts = 100;
-        
-        for (int attempt = 0; attempt < 1; attempt++) {
-            for (Block candidate : candidates) {
-            	System.out.println("Candidate x is mining");
-                if (tryMineBlock(candidate, timeLimitInSeconds, maxAttempts)) {
-             
+        for (int attempt = 0; attempt < 5; attempt++) {
+            List<Block> candidates = generateBlockCandidates(transactionPool, 5);
+            Map<Integer, Block> candidateMap = new HashMap<>();
+            IntStream.range(0, candidates.size()).forEach(i -> candidateMap.put(i, candidates.get(i)));
+
+            while (!candidateMap.isEmpty()) {
+                List<Integer> keys = new ArrayList<>(candidateMap.keySet());
+                int randomKeyIndex = random.nextInt(keys.size());
+                int candidateIndex = keys.get(randomKeyIndex);
+                Block candidate = candidateMap.get(candidateIndex);
+
+                System.out.println();
+                System.out.println("Candidate " + (candidateIndex + 1) + " is mining the block");
+                if (tryMineBlock(candidate, timeLimitInSeconds)) {
+                    System.out.println("Candidate " + (candidateIndex + 1) + " successfully mined the block");
                     this.chain.add(candidate);
                     isMined = true;
                     break;
                 }
+                System.out.println("Candidate " + (candidateIndex + 1) + " failed to mine the block");
+                candidateMap.remove(candidateIndex);
             }
-            
+
             if (isMined) {
                 break;
-            }
-            else {
-
-                timeLimitInSeconds += 0;
-                maxAttempts +=  0;
-                candidates = generateBlockCandidates(transactionPool, 5);
+            } else {
+                miningDifficulty--;
             }
         }
-        
+
         if (!isMined) {
-            System.out.println("Failed to mine any block after two attempts.");
+            if (Main.transactionPool.size() < 0) {
+                System.out.println("No more transactions in the pool");
+            } else {
+                System.out.println("Failed to mine blocks. Generating new candidates.");
+            }
         }
     }
     private List<Block> generateBlockCandidates(List<Transaction> transactionPool, int numCandidates) {
@@ -102,18 +111,37 @@ public class Blockchain {
         return candidates;
     }
 
-    private boolean tryMineBlock(Block block, int timeLimitInSeconds, int maxAttempts) {
+    private boolean tryMineBlock(Block block, int timeLimitInSeconds) {
     	
         long startTime = System.currentTimeMillis();
-        int attempts = 0;
+        int nonce = 0;
         
-        while ((System.currentTimeMillis() - startTime) < timeLimitInSeconds * 1000 && attempts < maxAttempts) {
-            block.mineBlock();
-            
+       	if(block.mineBlock(nonce) == false) {
+    		return false;
+    	}
+        
+        while ((System.currentTimeMillis() - startTime) < timeLimitInSeconds * 1000) {
+        	
+        	block.mineBlock(nonce);
+        	
             if (block.getBlockHash().substring(0, miningDifficulty).equals("0".repeat(miningDifficulty))) {
-                return true;
+            	
+            	System.out.println("Blokas iškastas su hash: " + block.getBlockHash());
+                System.out.println("Blokas iškastas su nonce: " + nonce);
+                Main.transactionPool.removeAll(block.getTransactions());
+                for(Transaction transaction : block.getTransactions()) {
+                	Main.usedTransactions.put(transaction, block);
+                }
+                block.saveBlockToFile();
+                Block.blocksInChain++;
+            	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime minedTime = LocalDateTime.now();
+                block.formattedMinedTime = minedTime.format(formatter); 
+            	return true;
+            	
             }
-            attempts++;
+            
+            nonce++;
         }
         return false;
     }

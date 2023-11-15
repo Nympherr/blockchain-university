@@ -71,6 +71,7 @@ public class Main {
 	    		    }
 	    			blockchain.displayBlockchain();
 	    			System.out.println();
+	    			Blockchain.miningDifficulty = 7; 
 	    			break;
 	    			
 	    		case 4:

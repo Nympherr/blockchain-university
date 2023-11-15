@@ -44,7 +44,7 @@ public class Block {
         return NewHash.sha256(this.merkleRootHash + this.previousBlockHash + this.formattedCreationTime + this.version + this.difficultyTarget + Integer.toString(nonce));
     }
 
-    public void mineBlock() {
+    public void mineGenesisBlock() {
     	
     	if(this.transactions.size() > 0) {
         	nonce = 0;
@@ -56,9 +56,9 @@ public class Block {
                 blockHash = calculateHash();
             } while (!blockHash.substring(0, this.difficultyTarget).equals(target));
             
-            
-            System.out.println("\nBlock Mined with hash: " + blockHash);
-            System.out.println("Block Mined with nonce: " + nonce);
+            System.out.println("\nGENESIS BLOKAS SUKURTAS");
+            System.out.println("Blokas iškastas su hash: " + blockHash);
+            System.out.println("Blokas iškastas su nonce: " + nonce);
             Main.transactionPool.removeAll(this.transactions);
             for(Transaction transaction : this.transactions) {
             	Main.usedTransactions.put(transaction, this);
@@ -70,22 +70,34 @@ public class Block {
     	}
     }
     
+    public boolean mineBlock(int nonce) {
+    	
+    	if(this.transactions.size() < 0) {
+    		return false;
+    	}
+    	else {
+    		this.nonce = nonce;
+            blockHash = this.calculateHash();
+            return true;
+    	}
+    }
+    
     public void saveBlockToFile() {
         try (FileWriter writer = new FileWriter("blockchain/blocks/" + this.blockHash + ".txt")) {
-            writer.write("Version: " + this.version + "\n");
-            writer.write("Previous Block Hash: " + this.previousBlockHash + "\n");
-            writer.write("Timestamp: " + this.formattedCreationTime + "\n");
-            writer.write("Difficulty Target: " + this.difficultyTarget + "\n");
+            writer.write("Versija: " + this.version + "\n");
+            writer.write("Praeito bloko hash: " + this.previousBlockHash + "\n");
+            writer.write("Laikas: " + this.formattedCreationTime + "\n");
+            writer.write("Sunkumo lygis: " + this.difficultyTarget + "\n");
             writer.write("Nonce: " + this.nonce + "\n");
-            writer.write("Block Hash: " + this.blockHash + "\n");
+            writer.write("Bloko hash: " + this.blockHash + "\n");
             writer.write("Merkle Root Hash: " + this.merkleRootHash + "\n");
-            writer.write("Transactions:\n");
+            writer.write("Transakcijos:\n");
             for (Transaction transaction : this.transactions) {
             	transaction.activateTransaction();
                 writer.write(transaction.toString() + "\n"); 
             }
         } catch (IOException e) {
-            System.out.println("An error occurred while saving the block: " + e.getMessage());
+            System.out.println("Įvyko klaida: " + e.getMessage());
         }
     }
     public int getTransactionSize() {
@@ -98,15 +110,18 @@ public class Block {
     	return this.blockHash;
     }
     public String toString() {
-    	return "\nBlock ID: " + this.blockID + "\nTransactions in block: " + this.transactions.size() +
-    			"\nBlock creation time: " + this.formattedCreationTime + "\nNonce: " + this.nonce + "\nVersion: " + this.version
-    			+ "\nDifficulty: " + this.difficultyTarget + "\nMerkle root hash: " + this.merkleRootHash +
-    			"\nPrevious block hash: " + this.previousBlockHash + "\nBlock hash: " + this.blockHash + "\nWhen was mined: " + this.formattedMinedTime;
+    	return "\nBloko ID: " + this.blockID + "\nTransakcijos bloke: " + this.transactions.size() +
+    			"\nBloko sukūrimo laikas: " + this.formattedCreationTime + "\nNonce: " + this.nonce + "\nVersija: " + this.version
+    			+ "\nSunkumo lygis: " + this.difficultyTarget + "\nMerkle root hash: " + this.merkleRootHash +
+    			"\nPraeito bloko hash: " + this.previousBlockHash + "\nBloko hash: " + this.blockHash + "\nIškasimo laikas: " + this.formattedMinedTime;
     }
     public void showTransactions() {
     	for(Transaction transaction : transactions) {
     		System.out.println(transaction);
     		System.out.println();
     	}
+    }
+    public ArrayList<Transaction> getTransactions(){
+    	return this.transactions;
     }
 }

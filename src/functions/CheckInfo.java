@@ -24,6 +24,9 @@ public class CheckInfo {
 			System.out.println("Kiek transakcijų yra blokuose: 0");
 			System.out.println("Atšauktos transakcijos: " + (Transaction.transactionNumber - Main.transactionPool.size()));
 			System.out.println("Iškasti blokai: 0");
+			System.out.println("Blokų kasimo sunkumo lygis: " + Blockchain.miningDifficulty);
+			System.out.println("Blockchain versija: " + Blockchain.blockchainVersion);
+			System.out.println("Didžiausias kiekis transakcijų, kuris galimas bloke: " + Blockchain.MAX_TRANSACTIONS);
 			System.out.println();
 		}
 		else {
@@ -42,10 +45,13 @@ public class CheckInfo {
 	    	System.out.println("=====================================");
 			System.out.println("\nVartotojų skaičius: " + Main.users.size());
 			System.out.println("Kiek sukurta transakcijų: " + Transaction.transactionNumber);
-			System.out.println("Kiek transakcijų yra pool'e: " + Main.transactionPool.size());
-			System.out.println("Kiek transakcijų yra blokuose: " + usedTransactions);
+			System.out.println("Kiek transakcijų yra pool'e (nepanaudotos): " + Main.transactionPool.size());
+			System.out.println("Kiek transakcijų yra blokuose (panaudotos): " + usedTransactions);
 			System.out.println("Atšauktos transakcijos: " + (Transaction.transactionNumber - Main.transactionPool.size() - usedTransactions));
 			System.out.println("Iškasti blokai: " + Block.blocksInChain);
+			System.out.println("Blokų kasimo sunkumo lygis: " + Blockchain.miningDifficulty);
+			System.out.println("Blockchain versija: " + Blockchain.blockchainVersion);
+			System.out.println("Didžiausias kiekis transakcijų, kuris galimas bloke: " + Blockchain.MAX_TRANSACTIONS);
 			System.out.println();
 		}
 	}
