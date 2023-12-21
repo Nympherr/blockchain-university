@@ -1,0 +1,45 @@
+body{
+    margin-top: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-image: url('./casino.webp');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.choice-btn{
+    height: 140px;
+    width: 140px;
+    border-radius: 25px;
+    font-size: 30px;
+    border: 1px solid black;
+}
+
+#interact-smart-contract{
+    margin-bottom: 85px;
+    margin-top:40px;
+    padding: 15px 50px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: 1px solid black;
+}
+.choices-div{
+    display: flex;
+    gap: 40px;
+}
+p{
+    margin:0;
+    margin-bottom: 10px;
+    font-weight: 600;
+    font-size: 25px;
+}
+.choice-btn.active{
+    background-color: black; /* Change background color */
+    color: white; /* Change text color */
+}
+.active-interaction{
+    background-color: black;
+    color: white;
+}
