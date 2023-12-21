@@ -1,6 +1,4 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider');
-// // const privateKeys = ['0x' + PRIVATE_KEY];
-// const privateKeys = ['0x16460e8f757cdca08ccb70fd1543452d5a6fe247ca82ee487bbe01acb8472314'];
 
 /**
  * Use this file to configure your truffle project. It's seeded with some
@@ -100,20 +98,6 @@ module.exports = {
     //   network_id: 2111,   // This network is yours, in the cloud.
     //   production: true    // Treats this network as if it was a public net. (default: false)
     // }
-    sepolia: {
-      provider: () => new HDWalletProvider({
-      mnemonic: {
-      phrase: "route when fun palace solution roast title bracket arrest local yard wish"
-      },
-      providerOrUrl: "https://sepolia.infura.io/v3/772a1943ccbe486a9cc0fb2a9501023c"
-      }),
-      network_id: 11155111, // Sepolia's network ID
-      gas: 4000000, // Adjust the gas limit as per your requirements
-      gasPrice: 10000000000, // Set the gas price to an appropriate value
-      confirmations: 2, // Set the number of confirmations needed for a transaction
-      timeoutBlocks: 2000, // Set the timeout for transactions
-      skipDryRun: true // Skip the dry run option
-     }
   },
 
   // Set default mocha options here, use special reporters, etc.
